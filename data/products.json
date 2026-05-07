@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "name": "Cool T-Shirt",
+        "price": 25,
+        "image": "",
+        "description": "A stylish t-shirt for everyday wear.",
+        "sizes": ["S", "M", "L", "XL", "XXL"],
+        "category": "shirts",
+        "comments": ["Looks great!", "Comfortable material."]
+    },
+    {
+        "id": 2,
+        "name": "Jeans",
+        "price": 50,
+        "image": "",
+        "description": "Classic jeans for a perfect fit.",
+        "sizes": ["S", "M", "L", "XL", "XXL"],
+        "category": "pants",
+        "comments": ["Fits perfectly.", "Good quality denim."]
+    },
+    {
+        "id": 3,
+        "name": "Hoodie",
+        "price": 40,
+        "image": "",
+        "description": "Warm and cozy hoodie.",
+        "sizes": ["S", "M", "L", "XL", "XXL"],
+        "category": "shirts",
+        "comments": ["Very warm!", "Great for winter."]
+    },
+    {
+        "id": 4,
+        "name": "Cap",
+        "price": 15,
+        "image": "",
+        "description": "Stylish cap for any occasion.",
+        "sizes": ["One Size"],
+        "category": "accessories",
+        "comments": ["Perfect fit.", "Durable material."]
+    }
+]
