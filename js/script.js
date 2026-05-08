@@ -28,26 +28,55 @@ function displayProducts(products) {
     const container = document.getElementById('products-container');
     container.innerHTML = '';
     
-    products.forEach(product => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.setAttribute('data-category', product.category);
-        
-        productCard.innerHTML = `
-            <img src="${product.image}" alt="${product.name}">
-            <h4>${product.name}</h4>
-            <p class="price">${product.price} RON / €${product.priceEur}</p>
-            <p class="description">${product.description}</p>
-            <button class="add-to-cart-btn" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}">Add to Cart</button>
-        `;
-        
-        container.appendChild(productCard);
+    const rowOrder = [
+        'T-Shirts',
+        'Hoodies',
+        'Short Pants',
+        'Long Pants',
+        'Accessories'
+    ];
+    
+    const grouped = products.reduce((groups, product) => {
+        const key = product.subCategory || 'Others';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(product);
+        return groups;
+    }, {});
+
+    rowOrder.forEach(rowKey => {
+        if (!grouped[rowKey] || grouped[rowKey].length === 0) return;
+
+        const row = document.createElement('div');
+        row.className = 'product-row';
+
+        const label = document.createElement('div');
+        label.className = 'row-label';
+        label.textContent = rowKey;
+
+        const rowCards = document.createElement('div');
+        rowCards.className = 'row-cards';
+
+        grouped[rowKey].forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <h4>${product.name}</h4>
+                <p class="price">${product.price} RON / €${product.priceEur}</p>
+                <p class="description">${product.description}</p>
+                <button class="add-to-cart-btn" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}">Add to Cart</button>
+            `;
+            rowCards.appendChild(productCard);
+        });
+
+        row.appendChild(label);
+        row.appendChild(rowCards);
+        container.appendChild(row);
     });
     
-    // Attach event listeners to add to cart buttons
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!btn.hasAttribute('data-price')) return; // Skip bundle buttons or invalid buttons
+            if (!btn.hasAttribute('data-price')) return;
             const productId = btn.getAttribute('data-product-id');
             const name = btn.getAttribute('data-name');
             const price = parseFloat(btn.getAttribute('data-price'));
