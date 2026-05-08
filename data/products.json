@@ -27,7 +27,7 @@
     "price": 40,
     "priceEur": 8,
     "image": "images/placeholder-tshirt-3.jpg",
-    "description": "Limited Edition T-Shirt - back text: 'i can flirt but im afraid of wommen'"
+    "description": "Limited Edition T-Shirt - back text: 'i can flirt but im afraid of women'"
   },
   {
     "id": "hoodie-black",
@@ -57,7 +57,7 @@
     "price": 50,
     "priceEur": 10,
     "image": "images/placeholder-hoodie-3.jpg",
-    "description": "Limited Edition Hoodie - back text: 'i can flirt but im afraid of wommen'"
+    "description": "Limited Edition Hoodie - back text: 'i can flirt but im afraid of women'"
   },
   {
     "id": "shorts-1",
