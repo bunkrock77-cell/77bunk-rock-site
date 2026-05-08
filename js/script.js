@@ -64,7 +64,15 @@ function displayProducts(products) {
                 <h4>${product.name}</h4>
                 <p class="price">${product.price} RON / €${product.priceEur}</p>
                 <p class="description">${product.description}</p>
-                <button class="add-to-cart-btn" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}">Add to Cart</button>
+                <label class="size-label" for="size-${product.id}">Size</label>
+                <select class="size-select" id="size-${product.id}" data-product-id="${product.id}">
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="S">S</option>
+                    <option value="XL">XL</option>
+                    <option value="One Size">One Size</option>
+                </select>
+                <button class="add-to-cart-btn" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-price-eur="${product.priceEur}">Add to Cart</button>
             `;
             rowCards.appendChild(productCard);
         });
@@ -74,13 +82,21 @@ function displayProducts(products) {
         container.appendChild(row);
     });
     
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.product-card .add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
             if (!btn.hasAttribute('data-price')) return;
             const productId = btn.getAttribute('data-product-id');
             const name = btn.getAttribute('data-name');
             const price = parseFloat(btn.getAttribute('data-price'));
-            addToCart(productId, name, price);
+            const priceEur = parseFloat(btn.getAttribute('data-price-eur')) || (price / 5);
+            let size = 'One Size';
+
+            const sizeSelect = document.querySelector(`.size-select[data-product-id="${productId}"]`);
+            if (sizeSelect) {
+                size = sizeSelect.value;
+            }
+
+            addToCart(productId, name, price, priceEur, size);
         });
     });
 }
@@ -88,11 +104,12 @@ function displayProducts(products) {
 // Attach bundle button listeners
 function setupBundleButtons() {
     document.querySelectorAll('.bundle-card .add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const productId = btn.getAttribute('data-product-id');
             const name = btn.getAttribute('data-name');
             const price = parseFloat(btn.getAttribute('data-price'));
-            addToCart(productId, name, price);
+            const priceEur = parseFloat(btn.getAttribute('data-price-eur')) || (price / 5);
+            addToCart(productId, name, price, priceEur, 'One Size');
         });
     });
 }
@@ -119,9 +136,8 @@ function setupCategoryFilters() {
 }
 
 // Add to cart
-function addToCart(productId, name, price) {
-    // Check if product already in cart
-    const existingItem = cart.find(item => item.productId === productId);
+function addToCart(productId, name, price, priceEur, size) {
+    const existingItem = cart.find(item => item.productId === productId && item.size === size);
     
     if (existingItem) {
         existingItem.quantity += 1;
@@ -130,6 +146,8 @@ function addToCart(productId, name, price) {
             productId: productId,
             name: name,
             price: price,
+            priceEur: priceEur,
+            size: size,
             quantity: 1
         });
     }
@@ -137,19 +155,27 @@ function addToCart(productId, name, price) {
     saveCart();
     updateCartDisplay();
     updateCartCount();
-    alert(name + ' added to cart!');
 }
 
 // Setup cart button
 function setupCartButton() {
-    document.getElementById('cart-btn').addEventListener('click', () => {
-        document.getElementById('cart-sidebar').classList.toggle('open');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartBtn = document.getElementById('cart-btn');
+
+    cartBtn.addEventListener('click', () => {
+        cartSidebar.classList.toggle('open');
     });
     
     document.getElementById('close-cart').addEventListener('click', () => {
-        document.getElementById('cart-sidebar').classList.remove('open');
+        cartSidebar.classList.remove('open');
     });
     
+    document.addEventListener('click', (event) => {
+        if (!cartSidebar.classList.contains('open')) return;
+        if (cartSidebar.contains(event.target) || cartBtn.contains(event.target)) return;
+        cartSidebar.classList.remove('open');
+    });
+
     document.getElementById('checkout-btn').addEventListener('click', () => {
         if (cart.length === 0) {
             alert('Your cart is empty!');
@@ -160,7 +186,7 @@ function setupCartButton() {
         saveCart();
         updateCartDisplay();
         updateCartCount();
-        document.getElementById('cart-sidebar').classList.remove('open');
+        cartSidebar.classList.remove('open');
     });
 }
 
@@ -171,24 +197,30 @@ function updateCartDisplay() {
     
     if (cart.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#999;">Your cart is empty</p>';
+        updateCartTotal();
         return;
     }
     
     cart.forEach((item, index) => {
+        const itemSubtotal = item.price * item.quantity;
+        const itemSubtotalEur = (item.priceEur || item.price / 5) * item.quantity;
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-item';
         cartItem.innerHTML = `
             <div class="cart-item-header">
-                <div class="cart-item-name">${item.name}</div>
+                <div>
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-meta">Size: ${item.size} • €${item.priceEur.toFixed(2)} each</div>
+                </div>
                 <button class="cart-item-remove" data-index="${index}">Remove</button>
             </div>
-            <div class="cart-item-price">${item.price} RON each</div>
+            <div class="cart-item-price">${item.price.toFixed(2)} RON each / €${item.priceEur.toFixed(2)} each</div>
             <div class="quantity-control">
                 <button class="quantity-btn minus" data-index="${index}">−</button>
                 <input type="number" class="quantity-input" value="${item.quantity}" data-index="${index}" min="1">
                 <button class="quantity-btn plus" data-index="${index}">+</button>
             </div>
-            <div style="margin-top: 8px; font-weight: bold;">Subtotal: ${(item.price * item.quantity).toFixed(2)} RON</div>
+            <div class="cart-item-subtotal">Subtotal: ${itemSubtotal.toFixed(2)} RON / €${itemSubtotalEur.toFixed(2)}</div>
         `;
         
         container.appendChild(cartItem);
@@ -250,12 +282,19 @@ function updateCartDisplay() {
 // Update cart total
 function updateCartTotal() {
     const total = calculateTotal();
+    const totalEur = calculateTotalEur();
     document.getElementById('cart-total-price').textContent = total.toFixed(2) + ' RON';
+    document.getElementById('cart-total-price-eur').textContent = '€' + totalEur.toFixed(2);
 }
 
 // Calculate cart total
 function calculateTotal() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+}
+
+// Calculate cart total in euros
+function calculateTotalEur() {
+    return cart.reduce((total, item) => total + ((item.priceEur || item.price / 5) * item.quantity), 0);
 }
 
 // Update cart count
