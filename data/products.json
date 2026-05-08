@@ -1,42 +1,137 @@
 [
-    {
-        "id": 1,
-        "name": "Cool T-Shirt",
-        "price": 25,
-        "image": "",
-        "description": "A stylish t-shirt for everyday wear.",
-        "sizes": ["S", "M", "L", "XL", "XXL"],
-        "category": "shirts",
-        "comments": ["Looks great!", "Comfortable material."]
-    },
-    {
-        "id": 2,
-        "name": "Jeans",
-        "price": 50,
-        "image": "",
-        "description": "Classic jeans for a perfect fit.",
-        "sizes": ["S", "M", "L", "XL", "XXL"],
-        "category": "pants",
-        "comments": ["Fits perfectly.", "Good quality denim."]
-    },
-    {
-        "id": 3,
-        "name": "Hoodie",
-        "price": 40,
-        "image": "",
-        "description": "Warm and cozy hoodie.",
-        "sizes": ["S", "M", "L", "XL", "XXL"],
-        "category": "shirts",
-        "comments": ["Very warm!", "Great for winter."]
-    },
-    {
-        "id": 4,
-        "name": "Cap",
-        "price": 15,
-        "image": "",
-        "description": "Stylish cap for any occasion.",
-        "sizes": ["One Size"],
-        "category": "accessories",
-        "comments": ["Perfect fit.", "Durable material."]
-    }
+  {
+    "id": "tshirt-black",
+    "name": "Black T-Shirt",
+    "category": "shirts-hoodies",
+    "price": 30,
+    "priceEur": 6,
+    "image": "images/placeholder-tshirt-1.jpg",
+    "description": "Classic black t-shirt"
+  },
+  {
+    "id": "tshirt-white",
+    "name": "White T-Shirt",
+    "category": "shirts-hoodies",
+    "price": 30,
+    "priceEur": 6,
+    "image": "images/placeholder-tshirt-2.jpg",
+    "description": "Classic white t-shirt"
+  },
+  {
+    "id": "tshirt-limited",
+    "name": "I Can Flirt (Limited Edition)",
+    "category": "shirts-hoodies",
+    "price": 40,
+    "priceEur": 8,
+    "image": "images/placeholder-tshirt-3.jpg",
+    "description": "Limited Edition T-Shirt - Back text: 'i can flirt but im afraid of wommen' - Only 1 year available!"
+  },
+  {
+    "id": "hoodie-black",
+    "name": "Black Hoodie",
+    "category": "shirts-hoodies",
+    "price": 40,
+    "priceEur": 8,
+    "image": "images/placeholder-hoodie-1.jpg",
+    "description": "Classic black hoodie"
+  },
+  {
+    "id": "hoodie-white",
+    "name": "White Hoodie",
+    "category": "shirts-hoodies",
+    "price": 40,
+    "priceEur": 8,
+    "image": "images/placeholder-hoodie-2.jpg",
+    "description": "Classic white hoodie"
+  },
+  {
+    "id": "hoodie-limited",
+    "name": "Flirt Master Hoodie (Limited Edition)",
+    "category": "shirts-hoodies",
+    "price": 50,
+    "priceEur": 10,
+    "image": "images/placeholder-hoodie-3.jpg",
+    "description": "Limited Edition Hoodie - Back text: 'i can flirt but im afraid of wommen' - Only 1 year available!"
+  },
+  {
+    "id": "shorts-1",
+    "name": "Classic Shorts",
+    "category": "pants",
+    "price": 35,
+    "priceEur": 7,
+    "image": "images/placeholder-shorts-1.jpg",
+    "description": "Comfortable classic shorts"
+  },
+  {
+    "id": "shorts-2",
+    "name": "Cargo Shorts",
+    "category": "pants",
+    "price": 35,
+    "priceEur": 7,
+    "image": "images/placeholder-shorts-2.jpg",
+    "description": "Practical cargo shorts with pockets"
+  },
+  {
+    "id": "shorts-custom",
+    "name": "Custom Shorts (Limited)",
+    "category": "pants",
+    "price": 45,
+    "priceEur": 9,
+    "image": "images/placeholder-shorts-3.jpg",
+    "description": "Limited edition custom shorts"
+  },
+  {
+    "id": "pants-casual",
+    "name": "Casual Pants",
+    "category": "pants",
+    "price": 35,
+    "priceEur": 7,
+    "image": "images/placeholder-pants-1.jpg",
+    "description": "Comfortable casual pants"
+  },
+  {
+    "id": "pants-slim",
+    "name": "Slim Fit Pants",
+    "category": "pants",
+    "price": 35,
+    "priceEur": 7,
+    "image": "images/placeholder-pants-2.jpg",
+    "description": "Modern slim fit pants"
+  },
+  {
+    "id": "pants-tapered",
+    "name": "Tapered Pants",
+    "category": "pants",
+    "price": 35,
+    "priceEur": 7,
+    "image": "images/placeholder-pants-3.jpg",
+    "description": "Stylish tapered pants"
+  },
+  {
+    "id": "ring-classic",
+    "name": "Silver Ring",
+    "category": "accessories",
+    "price": 20,
+    "priceEur": 4,
+    "image": "images/placeholder-accessory-1.jpg",
+    "description": "Classic silver ring"
+  },
+  {
+    "id": "chain",
+    "name": "Chain Accessory (Add to Pants)",
+    "category": "accessories",
+    "price": 25,
+    "priceEur": 5,
+    "image": "images/placeholder-accessory-2.jpg",
+    "description": "Chain that attaches to pants side"
+  },
+  {
+    "id": "chain-premium",
+    "name": "Premium Chain (Add to Pants)",
+    "category": "accessories",
+    "price": 30,
+    "priceEur": 6,
+    "image": "images/placeholder-accessory-3.jpg",
+    "description": "Premium quality chain for pants"
+  }
 ]
