@@ -120,8 +120,13 @@ nav a {
 #categories {
     padding: 20px;
     text-align: center;
+    background: linear-gradient(
+        180deg,
+        rgba(10, 18, 38, 0.98) 0%,
+        rgba(17, 34, 64, 0.96) 45%,
+        rgba(8, 14, 28, 0.98) 100%
+    );
 }
-
 .category-grid {
     display: flex;
     justify-content: center;
