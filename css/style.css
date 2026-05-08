@@ -175,7 +175,7 @@ nav a {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 20px;
     color: #fff;
