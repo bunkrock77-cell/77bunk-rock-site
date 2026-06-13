@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background: radial-gradient(circle at top left, #f7fbff, #eaf6ff 25%, #d6f0ff 55%, #cfe9ff 100%);
+    background: radial-gradient(circle at top left, #eef7ff, #dbefff 28%, #d0e8ff 56%, #c8e4ff 100%);
     color: #111;
     min-height: 100vh;
 }
@@ -198,13 +198,19 @@ nav a {
 }
 
 .product-card {
-    background: rgba(12, 17, 32, 0.95);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(7, 12, 24, 0.96);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 16px;
     padding: 18px;
     text-align: center;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     color: #eef1ff;
+}
+.product-card .description {
+    color: #cbd6ff;
+}
+.product-card .price {
+    color: #a8e8ff;
 }
 
 .product-card:hover {
@@ -828,23 +834,25 @@ footer {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.72);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   cursor: pointer;
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+  z-index: 12;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
 }
 
 .slide-btn:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .prev-btn {
@@ -861,21 +869,25 @@ footer {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 6px;
+  gap: 8px;
   z-index: 10;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.55);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dot:hover {
+  transform: scale(1.1);
 }
 
 .dot.active {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .view-badge {
@@ -906,7 +918,7 @@ footer {
 }
 .modal.open { display: flex; }
 .modal-content {
-    background: white;
+    background: #fff;
     color: #111;
     width: 95%;
     max-width: 900px;
@@ -915,6 +927,19 @@ footer {
     border-radius: 12px;
     padding: 18px;
     position: relative;
+    box-shadow: 0 18px 55px rgba(0,0,0,0.18);
+}
+.modal-content h2,
+.modal-content h3,
+.modal-content p,
+.modal-content label,
+.modal-content select,
+.modal-content textarea {
+    color: #111;
+}
+.modal-content button.add-to-cart-btn {
+    background: linear-gradient(135deg, #0d7cff, #18b0ff);
+    border: none;
 }
 .modal-content .size-select {
     background: #f4f6f8;
@@ -959,10 +984,16 @@ footer {
 #feedback-modal-body textarea {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 10px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.12);
+    padding: 10px 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.14);
+    background: #f9fbff;
+    color: #111;
+}
+#feedback-modal-body input::placeholder,
+#feedback-modal-body textarea::placeholder {
+    color: #7a8392;
 }
 
 /* Product modal slideshow larger */

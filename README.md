@@ -36,7 +36,7 @@ A simple clothing e-commerce website for 77bunk-rock.
 
 ## Deployment
 
-Below are step-by-step instructions to deploy the feedback server and the static site to three popular providers. The repository already contains `server.js` (Express), a `Procfile` for Heroku, and a serverless function in `api/feedback.js` for Vercel.
+Below are step-by-step instructions to deploy the feedback server and the static site to two popular providers. The repository contains `server.js` (Express) and a serverless function in `api/feedback.js` for Vercel.
 
 ### 1) Render (recommended)
 - Push your project to GitHub (example):
@@ -53,17 +53,7 @@ gh repo create your-repo-name --public --source=. --push
   - Set an environment variable `ADMIN_PASSWORD` to a secure password.
 - Render will build and expose your Node server. The site static files can be served by Render if you configure a static site, or host static files elsewhere and point client-side fetches to the Render server.
 
-### 2) Heroku
-- Ensure you have the Heroku CLI and are logged in.
-```bash
-heroku login
-heroku create
-git push heroku main
-heroku config:set ADMIN_PASSWORD=yourSecret
-```
-- The `Procfile` contains `web: node server.js` so Heroku will run the Express server. The feedback endpoint will be available at `https://<your-heroku-app>.herokuapp.com/api/feedback`.
-
-### 3) Vercel (serverless)
+### 2) Vercel (serverless)
 - Vercel supports serverless functions in the `api/` folder. This repo includes `api/feedback.js` which will run as a serverless function.
 - Note: serverless functions do not guarantee persistent disk storage. `api/feedback.js` writes to `/tmp/server-feedbacks.json` which is ephemeral and may be cleared. For reliable storage use a database (Supabase, Firebase, or a hosted Postgres).
 - To deploy:
