@@ -6,7 +6,7 @@
     "subCategory": "T-Shirts",
     "price": 30,
     "priceEur": 6,
-    "images": ["images/placeholder-tshirt-1-front.jpg", "images/placeholder-tshirt-1-back.jpg"],
+    "images": ["images/tshirt-front-black.svg", "images/tshirt-back-black.svg"],
     "description": "Classic black t-shirt",
     "hasBackView": true
   },
@@ -17,7 +17,7 @@
     "subCategory": "T-Shirts",
     "price": 30,
     "priceEur": 6,
-    "images": ["images/placeholder-tshirt-2-front.jpg", "images/placeholder-tshirt-2-back.jpg"],
+    "images": ["images/tshirt-front-white.svg", "images/tshirt-back-white.svg"],
     "description": "Classic white t-shirt",
     "hasBackView": true
   },
@@ -28,7 +28,7 @@
     "subCategory": "T-Shirts",
     "price": 40,
     "priceEur": 8,
-    "images": ["images/placeholder-tshirt-3-front.jpg", "images/placeholder-tshirt-3-back.jpg"],
+    "images": ["images/tshirt-front-black.svg", "images/tshirt-back-white.svg"],
     "description": "Limited Edition T-Shirt - back text: 'i can flirt but im afraid of women'",
     "hasBackView": true
   },
@@ -39,7 +39,7 @@
     "subCategory": "Hoodies",
     "price": 40,
     "priceEur": 8,
-    "images": ["images/placeholder-hoodie-1-front.jpg", "images/placeholder-hoodie-1-back.jpg"],
+    "images": ["images/tshirt-front-black.svg", "images/tshirt-back-black.svg"],
     "description": "Classic black hoodie",
     "hasBackView": true
   },
@@ -50,7 +50,7 @@
     "subCategory": "Hoodies",
     "price": 40,
     "priceEur": 8,
-    "images": ["images/placeholder-hoodie-2-front.jpg", "images/placeholder-hoodie-2-back.jpg"],
+    "images": ["images/tshirt-front-white.svg", "images/tshirt-back-white.svg"],
     "description": "Classic white hoodie",
     "hasBackView": true
   },
@@ -61,7 +61,7 @@
     "subCategory": "Hoodies",
     "price": 50,
     "priceEur": 10,
-    "images": ["images/placeholder-hoodie-3-front.jpg", "images/placeholder-hoodie-3-back.jpg"],
+    "images": ["images/tshirt-front-white.svg", "images/tshirt-back-black.svg"],
     "description": "Limited Edition Hoodie - back text: 'i can flirt but im afraid of women'",
     "hasBackView": true
   },
@@ -72,7 +72,7 @@
     "subCategory": "Short Pants",
     "price": 35,
     "priceEur": 7,
-    "images": ["images/placeholder-shorts-1.jpg"],
+    "images": ["images/pants-black.svg"],
     "description": "Comfortable classic shorts",
     "hasBackView": false
   },
@@ -83,7 +83,7 @@
     "subCategory": "Short Pants",
     "price": 35,
     "priceEur": 7,
-    "images": ["images/placeholder-shorts-2.jpg"],
+    "images": ["images/pants-white.svg"],
     "description": "Practical cargo shorts with pockets",
     "hasBackView": false
   },
@@ -94,7 +94,7 @@
     "subCategory": "Short Pants",
     "price": 45,
     "priceEur": 9,
-    "images": ["images/placeholder-shorts-3.jpg"],
+    "images": ["images/pants-black.svg"],
     "description": "Limited edition custom shorts",
     "hasBackView": false
   },
@@ -105,7 +105,7 @@
     "subCategory": "Long Pants",
     "price": 35,
     "priceEur": 7,
-    "images": ["images/placeholder-pants-1.jpg"],
+    "images": ["images/pants-white.svg"],
     "description": "Comfortable casual pants",
     "hasBackView": false
   },
@@ -116,7 +116,7 @@
     "subCategory": "Long Pants",
     "price": 35,
     "priceEur": 7,
-    "images": ["images/placeholder-pants-2.jpg"],
+    "images": ["images/pants-black.svg"],
     "description": "Modern slim fit pants",
     "hasBackView": false
   },
@@ -127,7 +127,7 @@
     "subCategory": "Long Pants",
     "price": 35,
     "priceEur": 7,
-    "images": ["images/placeholder-pants-3.jpg"],
+    "images": ["images/pants-white.svg"],
     "description": "Stylish tapered pants",
     "hasBackView": false
   },
@@ -138,7 +138,7 @@
     "subCategory": "Accessories",
     "price": 20,
     "priceEur": 4,
-    "images": ["images/placeholder-accessory-1.jpg"],
+    "images": ["images/tshirt-front-white.svg"],
     "description": "Classic silver ring",
     "hasBackView": false
   },
@@ -149,7 +149,7 @@
     "subCategory": "Accessories",
     "price": 25,
     "priceEur": 5,
-    "images": ["images/placeholder-accessory-2.jpg"],
+    "images": ["images/tshirt-front-black.svg"],
     "description": "Chain that attaches to pants side",
     "hasBackView": false
   },
@@ -160,7 +160,7 @@
     "subCategory": "Accessories",
     "price": 30,
     "priceEur": 6,
-    "images": ["images/placeholder-accessory-3.jpg"],
+    "images": ["images/tshirt-front-white.svg"],
     "description": "Premium quality chain for pants",
     "hasBackView": false
   }

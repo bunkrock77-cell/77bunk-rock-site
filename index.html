@@ -14,7 +14,7 @@
         <nav>
             <a href="#home">Home</a>
             <a href="#shop">Shop</a>
-            <a href="#about">About Us</a>
+            <a href="#about" id="about-link">About Us</a>
             <a href="#contact">Contact</a>
             <div class="search">
                 <input type="text" placeholder="Search products...">
@@ -109,6 +109,32 @@
         </div>
     </div>
 
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <button id="product-modal-close" class="modal-close">&times;</button>
+            <div id="product-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <button id="feedback-modal-close" class="modal-close">&times;</button>
+            <div id="feedback-modal-body">
+                <h3>Send Feedback</h3>
+                <form id="feedback-form">
+                    <input type="text" id="fb-name" placeholder="Your name" required>
+                    <input type="email" id="fb-email" placeholder="Your email (optional)">
+                    <textarea id="fb-message" placeholder="Your message" required></textarea>
+                    <button type="submit" class="add-to-cart-btn">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button id="feedback-float" title="Send feedback">✉️</button>
+
     <footer>
         <div class="social">
             <a href="#">Instagram</a>
@@ -119,6 +145,7 @@
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">Shipping</a>
+            <a href="#" id="admin-feedback-link">Admin Feedback</a>
         </div>
         <p>&copy; 2026 77bunk-rock. All rights reserved.</p>
     </footer>

@@ -2,6 +2,44 @@
 let allProducts = [];
 let cart = [];
 let currentCategory = 'all';
+let slidesState = {};
+const ADMIN_PASSWORD = 'MakingCodesH112'; // change this to your secret (client-side fallback). When deploying the server set the server's ADMIN_PASSWORD env var to the same secret.
+let slidesTimers = {};
+let slidesPausedUntil = {};
+
+function startAutoAdvance(id, length, interval = 4000) {
+    stopAutoAdvance(id);
+    slidesTimers[id] = setInterval(() => {
+        const now = Date.now();
+        if (slidesPausedUntil[id] && now < slidesPausedUntil[id]) return; // paused
+        const current = slidesState[id] || 0;
+        const next = (current + 1) % length;
+        const container = document.querySelector(`#slideshow-${id}`) || document.querySelector(`#modal-slideshow-${id.replace('modal-','')}`);
+        if (!container) return;
+        const show = (cid, idx) => {
+            const s = document.querySelectorAll(`#slideshow-${cid} .slide`);
+            const dots = document.querySelectorAll(`#slideshow-${cid} .dot`);
+            if (!s.length) return;
+            s.forEach(sl => sl.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            if (s[idx]) s[idx].classList.add('active');
+            if (dots[idx]) dots[idx].classList.add('active');
+            slidesState[cid] = idx;
+        };
+        show(id, next);
+    }, interval);
+}
+
+function stopAutoAdvance(id) {
+    if (slidesTimers[id]) {
+        clearInterval(slidesTimers[id]);
+        delete slidesTimers[id];
+    }
+}
+
+function pauseAutoAdvance(id, ms = 10000) {
+    slidesPausedUntil[id] = Date.now() + ms;
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,7 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCartButton();
     setupBundleButtons();
     loadCart();
+    setupAboutLink();
 });
+
+function setupAboutLink() {
+    const about = document.getElementById('about-link');
+    if (!about) return;
+    about.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("About Us: We're two 14-year-old friends who dream of starting a kids' clothing brand — creating fun, comfy pieces that reflect our creativity and dreams.");
+    });
+}
 
 // Load products from JSON
 function loadProducts() {
@@ -59,8 +107,23 @@ function displayProducts(products) {
         grouped[rowKey].forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+
+            // Build slideshow markup using product.images (fallback to single image)
+            const images = Array.isArray(product.images) && product.images.length ? product.images : [(product.image || 'images/placeholder.png')];
+            let slidesHtml = `<div class="slideshow-container" id="slideshow-${product.id}">`;
+            images.forEach((src, idx) => {
+                slidesHtml += `\n  <div class="slide" data-index="${idx}">\n    <img src="${src}" alt="${product.name} view ${idx+1}">\n  </div>`;
+            });
+            slidesHtml += `\n  <button class="slide-btn prev-btn" data-product="${product.id}">‹</button>`;
+            slidesHtml += `\n  <button class="slide-btn next-btn" data-product="${product.id}">›</button>`;
+            slidesHtml += `\n  <div class="slide-dots">`;
+            images.forEach((_, idx) => {
+                slidesHtml += `<div class="dot" data-product="${product.id}" data-index="${idx}"></div>`;
+            });
+            slidesHtml += `</div></div>`;
+
             productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.name}">
+                ${slidesHtml}
                 <h4>${product.name}</h4>
                 <p class="price">${product.price} RON / €${product.priceEur}</p>
                 <p class="description">${product.description}</p>
@@ -74,7 +137,78 @@ function displayProducts(products) {
                 </select>
                 <button class="add-to-cart-btn" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-price-eur="${product.priceEur}">Add to Cart</button>
             `;
+
+            // initialize slideshow state
+            slidesState[product.id] = 0;
             rowCards.appendChild(productCard);
+            
+                // Attach slideshow handlers
+                const slideshow = productCard.querySelector(`#slideshow-${product.id}`);
+                if (slideshow) {
+                    const showSlide = (id, index) => {
+                        const s = document.querySelectorAll(`#slideshow-${id} .slide`);
+                        const dots = document.querySelectorAll(`#slideshow-${id} .dot`);
+                        s.forEach(sl => sl.classList.remove('active'));
+                        dots.forEach(d => d.classList.remove('active'));
+                        if (s[index]) s[index].classList.add('active');
+                        if (dots[index]) dots[index].classList.add('active');
+                        slidesState[id] = index;
+                    };
+
+                    const prev = productCard.querySelector('.prev-btn');
+                    const next = productCard.querySelector('.next-btn');
+                    prev.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = prev.getAttribute('data-product');
+                        const nextIndex = (slidesState[id] - 1 + images.length) % images.length;
+                        showSlide(id, nextIndex);
+                        pauseAutoAdvance(id);
+                    });
+                    next.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = next.getAttribute('data-product');
+                        const nextIndex = (slidesState[id] + 1) % images.length;
+                        showSlide(id, nextIndex);
+                        pauseAutoAdvance(id);
+                    });
+
+                    productCard.querySelectorAll('.dot').forEach(dot => {
+                        dot.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const id = dot.getAttribute('data-product');
+                            const idx = parseInt(dot.getAttribute('data-index'));
+                            showSlide(id, idx);
+                            pauseAutoAdvance(id);
+                        });
+                    });
+
+                    // show initial
+                    showSlide(product.id, 0);
+                    // add touch swipe support
+                    let touchStartX = 0;
+                    let touchEndX = 0;
+                    slideshow.addEventListener('touchstart', (ev) => {
+                        touchStartX = ev.changedTouches[0].screenX;
+                        pauseAutoAdvance(product.id);
+                    }, {passive:true});
+                    slideshow.addEventListener('touchend', (ev) => {
+                        touchEndX = ev.changedTouches[0].screenX;
+                        const diff = touchStartX - touchEndX;
+                        const threshold = 40; // px
+                        if (Math.abs(diff) > threshold) {
+                            if (diff > 0) { // swipe left -> next
+                                const nextIndex = (slidesState[product.id] + 1) % images.length;
+                                showSlide(product.id, nextIndex);
+                            } else { // swipe right -> prev
+                                const prevIndex = (slidesState[product.id] - 1 + images.length) % images.length;
+                                showSlide(product.id, prevIndex);
+                            }
+                            pauseAutoAdvance(product.id);
+                        }
+                    }, {passive:true});
+                    // start auto-advance
+                    startAutoAdvance(product.id, images.length);
+                }
         });
 
         row.appendChild(label);
@@ -98,6 +232,205 @@ function displayProducts(products) {
 
             addToCart(productId, name, price, priceEur, size);
         });
+    });
+}
+
+// PRODUCT MODAL: open when clicking a product card
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.product-card');
+    if (!card) return;
+    // ignore clicks on buttons/inputs inside the card
+    if (e.target.closest('button') || e.target.closest('select') || e.target.closest('.slide-btn') ) return;
+    // find product id from size-select or add-to-cart-btn data
+    const sizeSelect = card.querySelector('.size-select');
+    const pid = sizeSelect ? sizeSelect.getAttribute('data-product-id') : null;
+    if (pid) openProductModal(pid);
+});
+
+function openProductModal(productId) {
+    const product = allProducts.find(p => String(p.id) === String(productId));
+    if (!product) return;
+    const modal = document.getElementById('product-modal');
+    const body = document.getElementById('product-modal-body');
+    const images = Array.isArray(product.images) && product.images.length ? product.images : [(product.image || 'images/placeholder.png')];
+    let html = `
+        <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;">
+            <div style="flex:1; min-width:320px;">
+                <div class="slideshow-container" id="modal-slideshow-${product.id}">`;
+    images.forEach((src, idx) => {
+        html += `\n  <div class="slide" data-index="${idx}">\n    <img src="${src}" alt="${product.name} view ${idx+1}">\n  </div>`;
+    });
+    html += `\n  <button class="slide-btn prev-btn" data-product="modal-${product.id}">‹</button>`;
+    html += `\n  <button class="slide-btn next-btn" data-product="modal-${product.id}">›</button>`;
+    html += `\n  <div class="slide-dots">`;
+    images.forEach((_, idx) => { html += `<div class="dot" data-product="modal-${product.id}" data-index="${idx}"></div>`; });
+    html += `</div></div>`;
+
+    html += `</div>
+            <div style="flex:1; min-width:260px;">
+                <h2>${product.name}</h2>
+                <p class="price">${product.price} RON / €${product.priceEur}</p>
+                <p>${product.description}</p>
+                <div>
+                    <label class="size-label">Size</label>
+                    <select class="size-select" id="modal-size-${product.id}">
+                        <option>M</option><option>L</option><option>S</option><option>XL</option><option>One Size</option>
+                    </select>
+                </div>
+                <button class="add-to-cart-btn" id="modal-add-${product.id}" data-product-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-price-eur="${product.priceEur}">Add to Cart</button>
+                <hr>
+                <h3>Comments</h3>
+                <div id="comments-${product.id}" class="comments-list"></div>
+                <form id="comment-form-${product.id}">
+                    <input type="text" id="comment-name-${product.id}" placeholder="Your name" required>
+                    <textarea id="comment-text-${product.id}" placeholder="Your comment" required></textarea>
+                    <button type="submit" class="add-to-cart-btn">Post Comment</button>
+                </form>
+            </div>
+        </div>`;
+
+    body.innerHTML = html;
+
+    // show modal
+    modal.classList.add('open');
+
+    // init modal slideshow
+    const modalSlideshow = document.getElementById(`modal-slideshow-${product.id}`);
+    slidesState[`modal-${product.id}`] = 0;
+    const showModalSlide = (id, index) => {
+        const s = document.querySelectorAll(`#modal-slideshow-${product.id} .slide`);
+        const dots = document.querySelectorAll(`#modal-slideshow-${product.id} .dot`);
+        s.forEach(sl => sl.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+        if (s[index]) s[index].classList.add('active');
+        if (dots[index]) dots[index].classList.add('active');
+        slidesState[id] = index;
+    };
+    showModalSlide(`modal-${product.id}`, 0);
+    modalSlideshow.querySelector('.prev-btn').addEventListener('click', (e) => { e.stopPropagation(); const id = `modal-${product.id}`; const prevIndex = (slidesState[id] - 1 + images.length) % images.length; showModalSlide(id, prevIndex); pauseAutoAdvance(id); });
+    modalSlideshow.querySelector('.next-btn').addEventListener('click', (e) => { e.stopPropagation(); const id = `modal-${product.id}`; const nextIndex = (slidesState[id] + 1) % images.length; showModalSlide(id, nextIndex); pauseAutoAdvance(id); });
+    modalSlideshow.querySelectorAll('.dot').forEach(dot => dot.addEventListener('click', (e) => { e.stopPropagation(); const idx = parseInt(dot.getAttribute('data-index')); showModalSlide(`modal-${product.id}`, idx); pauseAutoAdvance(`modal-${product.id}`); }));
+    // touch swipe for modal slideshow
+    let tStart=0, tEnd=0;
+    modalSlideshow.addEventListener('touchstart', (ev)=> { tStart = ev.changedTouches[0].screenX; pauseAutoAdvance(`modal-${product.id}`); }, {passive:true});
+    modalSlideshow.addEventListener('touchend', (ev)=> { tEnd = ev.changedTouches[0].screenX; const diff = tStart - tEnd; if (Math.abs(diff) > 40) { if (diff>0) { const id = `modal-${product.id}`; const nextIndex=(slidesState[id]+1)%images.length; showModalSlide(id,nextIndex); } else { const id=`modal-${product.id}`; const prevIndex=(slidesState[id]-1+images.length)%images.length; showModalSlide(id,prevIndex); } pauseAutoAdvance(`modal-${product.id}`); } }, {passive:true});
+    // start modal auto-advance
+    startAutoAdvance(`modal-${product.id}`, images.length);
+
+    // comments load
+    const commentsContainer = document.getElementById(`comments-${product.id}`);
+    function loadComments() {
+        const all = JSON.parse(localStorage.getItem('product_comments')||'{}');
+        const list = all[product.id]||[];
+        commentsContainer.innerHTML = list.map(c => `<div class="comment"><h5>${escapeHtml(c.name)}</h5><p>${escapeHtml(c.text)}</p></div>`).join('') || '<p style="color:#666">No comments yet</p>';
+    }
+    loadComments();
+    // comment form
+    const commentForm = document.getElementById(`comment-form-${product.id}`);
+    commentForm.addEventListener('submit', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); const name = document.getElementById(`comment-name-${product.id}`).value.trim(); const text = document.getElementById(`comment-text-${product.id}`).value.trim(); if (!name||!text) return; const all = JSON.parse(localStorage.getItem('product_comments')||'{}'); all[product.id] = all[product.id]||[]; all[product.id].push({name,text,ts:Date.now()}); localStorage.setItem('product_comments', JSON.stringify(all)); commentForm.reset(); loadComments(); });
+
+    // add-to-cart in modal
+    const modalAdd = document.getElementById(`modal-add-${product.id}`);
+    modalAdd.addEventListener('click', (ev)=>{ ev.stopPropagation(); const size = document.getElementById(`modal-size-${product.id}`).value; addToCart(product.id, product.name, product.price, product.priceEur, size); alert('Added to cart'); });
+
+    // close handlers
+    document.getElementById('product-modal-close').addEventListener('click', ()=>{ modal.classList.remove('open'); });
+    modal.addEventListener('click', (ev)=>{ if (ev.target === modal) modal.classList.remove('open'); });
+}
+
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Feedback form behavior
+document.getElementById('feedback-float').addEventListener('click', ()=>{ document.getElementById('feedback-modal').classList.add('open'); });
+document.getElementById('feedback-modal-close').addEventListener('click', ()=>{ document.getElementById('feedback-modal').classList.remove('open'); });
+document.getElementById('feedback-form').addEventListener('submit', async (ev)=>{
+    ev.preventDefault();
+    const name = document.getElementById('fb-name').value.trim();
+    const email = document.getElementById('fb-email').value.trim();
+    const message = document.getElementById('fb-message').value.trim();
+    if (!name||!message) return;
+    const payload = { name, email, message };
+    // try sending to server API first
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(()=>controller.abort(), 4000);
+        const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+            document.getElementById('feedback-form').reset();
+            alert('Thanks for the feedback!');
+            document.getElementById('feedback-modal').classList.remove('open');
+            return;
+        }
+    } catch (err) {
+        // server not available or timed out; fallback to localStorage
+    }
+    const arr = JSON.parse(localStorage.getItem('feedbacks')||'[]'); arr.push({name,email,message,ts:Date.now()}); localStorage.setItem('feedbacks', JSON.stringify(arr)); document.getElementById('feedback-form').reset(); alert('Thanks for the feedback! (saved locally)'); document.getElementById('feedback-modal').classList.remove('open');
+});
+
+// Admin feedback view (very simple local-password protected)
+document.getElementById('admin-feedback-link').addEventListener('click', async (ev)=>{ 
+    ev.preventDefault(); 
+    const pw = prompt('Enter admin password to view feedbacks'); 
+    if (!pw) return;
+    const modal = document.getElementById('feedback-modal');
+    // try server first
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(()=>controller.abort(), 3000);
+        const res = await fetch('/api/admin/feedbacks?pw=' + encodeURIComponent(pw), { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+            const data = await res.json();
+            const arr = data.feedbacks || [];
+            const out = arr.map((f,i)=>`${i+1}. ${f.name} (${f.email||'no email'})\n${f.message}\n---`).join('\n\n') || 'No feedbacks yet';
+            document.getElementById('feedback-modal-body').innerHTML = `<h3>Feedbacks (server)</h3><pre style="white-space:pre-wrap">${escapeHtml(out)}</pre><button id="feedback-back" class="add-to-cart-btn">Back</button>`;
+            modal.classList.add('open');
+            document.getElementById('feedback-back').addEventListener('click', ()=>{ modal.classList.remove('open'); resetFeedbackModal(); });
+            return;
+        }
+    } catch (err) {
+        // server not available or unauthorized; continue to local check
+    }
+    // fallback: check localStorage if password matches client ADMIN_PASSWORD
+    if (pw !== ADMIN_PASSWORD) { alert('Incorrect password'); return; }
+    const arr = JSON.parse(localStorage.getItem('feedbacks')||'[]'); const out = arr.map((f,i)=>`${i+1}. ${f.name} (${f.email||'no email'})\n${f.message}\n---`).join('\n\n') || 'No feedbacks yet';
+    document.getElementById('feedback-modal-body').innerHTML = `<h3>Feedbacks (local)</h3><pre style="white-space:pre-wrap">${escapeHtml(out)}</pre><button id="feedback-back" class="add-to-cart-btn">Back</button>`;
+    modal.classList.add('open');
+    document.getElementById('feedback-back').addEventListener('click', ()=>{ modal.classList.remove('open'); resetFeedbackModal(); });
+});
+
+function resetFeedbackModal(){
+    document.getElementById('feedback-modal-body').innerHTML = `
+                <h3>Send Feedback</h3>
+                <form id="feedback-form">
+                    <input type="text" id="fb-name" placeholder="Your name" required>
+                    <input type="email" id="fb-email" placeholder="Your email (optional)">
+                    <textarea id="fb-message" placeholder="Your message" required></textarea>
+                    <button type="submit" class="add-to-cart-btn">Send</button>
+                </form>
+            `;
+    // reattach submit handler
+    document.getElementById('feedback-form').addEventListener('submit', async (ev)=>{
+        ev.preventDefault();
+        const name = document.getElementById('fb-name').value.trim();
+        const email = document.getElementById('fb-email').value.trim();
+        const message = document.getElementById('fb-message').value.trim();
+        if (!name||!message) return;
+        const payload = { name, email, message };
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(()=>controller.abort(), 4000);
+            const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal });
+            clearTimeout(timeout);
+            if (res.ok) {
+                document.getElementById('feedback-form').reset();
+                alert('Thanks for the feedback!');
+                document.getElementById('feedback-modal').classList.remove('open');
+                return;
+            }
+        } catch (err) {}
+        const arr = JSON.parse(localStorage.getItem('feedbacks')||'[]'); arr.push({name,email,message,ts:Date.now()}); localStorage.setItem('feedbacks', JSON.stringify(arr)); document.getElementById('feedback-form').reset(); alert('Thanks for the feedback! (saved locally)'); document.getElementById('feedback-modal').classList.remove('open');
     });
 }
 
@@ -229,6 +562,7 @@ function updateCartDisplay() {
     // Attach event listeners for quantity controls
     document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const index = e.target.getAttribute('data-index');
             if (cart[index].quantity > 1) {
                 cart[index].quantity -= 1;
@@ -243,6 +577,7 @@ function updateCartDisplay() {
     
     document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const index = e.target.getAttribute('data-index');
             cart[index].quantity += 1;
             saveCart();
@@ -253,6 +588,7 @@ function updateCartDisplay() {
     
     document.querySelectorAll('.quantity-input').forEach(input => {
         input.addEventListener('change', (e) => {
+            e.stopPropagation();
             const index = e.target.getAttribute('data-index');
             const value = parseInt(e.target.value);
             if (value < 1) {
@@ -268,6 +604,7 @@ function updateCartDisplay() {
     
     document.querySelectorAll('.cart-item-remove').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const index = e.target.getAttribute('data-index');
             cart.splice(index, 1);
             saveCart();
