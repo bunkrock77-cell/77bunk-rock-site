@@ -798,21 +798,30 @@ footer {
   background: #111827;
 }
 
+.slideshow-container { background: linear-gradient(180deg,#0f1724,#0b1220); }
 .slide {
-  display: none;
-  width: 100%;
-  height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: scale(1.02);
+    transition: opacity 420ms cubic-bezier(.2,.8,.2,1), transform 420ms cubic-bezier(.2,.8,.2,1);
+    display: block;
 }
 
 .slide.active {
-  display: block;
+    opacity: 1;
+    transform: scale(1);
 }
 
 .slide img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 14px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
 }
 
 .slide-btn {
@@ -907,6 +916,17 @@ footer {
     padding: 18px;
     position: relative;
 }
+.modal-content .size-select {
+    background: #f4f6f8;
+    color: #111;
+    border: 1px solid #d0d7de;
+}
+.modal-content .size-label {
+    color: #222;
+}
+.modal-content .add-to-cart-btn {
+    color: #fff;
+}
 .modal-close {
     position: absolute;
     right: 12px;
@@ -952,8 +972,9 @@ footer {
 /* Comments */
 .comments-list { margin-top: 12px; }
 .comment { padding: 10px; border-bottom: 1px solid #eee; }
-.comment h5 { margin: 0 0 6px 0; font-size: 14px; }
-.comment p { margin: 0; font-size: 13px; }
+.comment h5 { display:none; }
+.comment p { margin: 0; font-size: 14px; color:#222; }
+.comment time { display:block; margin-top:6px; font-size:12px; color:#666; }
 @media (max-width: 480px) and (orientation: landscape) {
     .row-cards {
         grid-template-columns: repeat(2, 1fr);

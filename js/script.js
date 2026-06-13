@@ -14,19 +14,18 @@ function startAutoAdvance(id, length, interval = 4000) {
         if (slidesPausedUntil[id] && now < slidesPausedUntil[id]) return; // paused
         const current = slidesState[id] || 0;
         const next = (current + 1) % length;
-        const container = document.querySelector(`#slideshow-${id}`) || document.querySelector(`#modal-slideshow-${id.replace('modal-','')}`);
+        // find the correct container for either normal or modal slides
+        const container = document.querySelector(`#slideshow-${id}`) || document.querySelector(`#modal-slideshow-${String(id).replace('modal-','')}`);
         if (!container) return;
-        const show = (cid, idx) => {
-            const s = document.querySelectorAll(`#slideshow-${cid} .slide`);
-            const dots = document.querySelectorAll(`#slideshow-${cid} .dot`);
-            if (!s.length) return;
-            s.forEach(sl => sl.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
-            if (s[idx]) s[idx].classList.add('active');
-            if (dots[idx]) dots[idx].classList.add('active');
-            slidesState[cid] = idx;
-        };
-        show(id, next);
+        const slides = container.querySelectorAll('.slide');
+        const dots = container.querySelectorAll('.dot');
+        if (!slides.length) return;
+        slides.forEach(sl => sl.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+        const idx = next;
+        if (slides[idx]) slides[idx].classList.add('active');
+        if (dots[idx]) dots[idx].classList.add('active');
+        slidesState[id] = idx;
     }, interval);
 }
 
@@ -282,8 +281,7 @@ function openProductModal(productId) {
                 <h3>Comments</h3>
                 <div id="comments-${product.id}" class="comments-list"></div>
                 <form id="comment-form-${product.id}">
-                    <input type="text" id="comment-name-${product.id}" placeholder="Your name" required>
-                    <textarea id="comment-text-${product.id}" placeholder="Your comment" required></textarea>
+                    <textarea id="comment-text-${product.id}" placeholder="Write your comment" required></textarea>
                     <button type="submit" class="add-to-cart-btn">Post Comment</button>
                 </form>
             </div>
@@ -317,25 +315,51 @@ function openProductModal(productId) {
     // start modal auto-advance
     startAutoAdvance(`modal-${product.id}`, images.length);
 
-    // comments load
+    // comments load (name omitted by design)
     const commentsContainer = document.getElementById(`comments-${product.id}`);
     function loadComments() {
         const all = JSON.parse(localStorage.getItem('product_comments')||'{}');
         const list = all[product.id]||[];
-        commentsContainer.innerHTML = list.map(c => `<div class="comment"><h5>${escapeHtml(c.name)}</h5><p>${escapeHtml(c.text)}</p></div>`).join('') || '<p style="color:#666">No comments yet</p>';
+        commentsContainer.innerHTML = list.map(c => {
+            const when = c.ts ? ` <time>${new Date(c.ts).toLocaleString()}</time>` : '';
+            return `<div class="comment"><p>${escapeHtml(c.text)}</p>${when}</div>`;
+        }).join('') || '<p style="color:#666">No comments yet</p>';
     }
     loadComments();
-    // comment form
+    // comment form (no name field)
     const commentForm = document.getElementById(`comment-form-${product.id}`);
-    commentForm.addEventListener('submit', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); const name = document.getElementById(`comment-name-${product.id}`).value.trim(); const text = document.getElementById(`comment-text-${product.id}`).value.trim(); if (!name||!text) return; const all = JSON.parse(localStorage.getItem('product_comments')||'{}'); all[product.id] = all[product.id]||[]; all[product.id].push({name,text,ts:Date.now()}); localStorage.setItem('product_comments', JSON.stringify(all)); commentForm.reset(); loadComments(); });
+    commentForm.addEventListener('submit', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); const text = document.getElementById(`comment-text-${product.id}`).value.trim(); if (!text) return; const all = JSON.parse(localStorage.getItem('product_comments')||'{}'); all[product.id] = all[product.id]||[]; all[product.id].push({text,ts:Date.now()}); localStorage.setItem('product_comments', JSON.stringify(all)); commentForm.reset(); loadComments(); });
 
     // add-to-cart in modal
     const modalAdd = document.getElementById(`modal-add-${product.id}`);
     modalAdd.addEventListener('click', (ev)=>{ ev.stopPropagation(); const size = document.getElementById(`modal-size-${product.id}`).value; addToCart(product.id, product.name, product.price, product.priceEur, size); alert('Added to cart'); });
 
-    // close handlers
-    document.getElementById('product-modal-close').addEventListener('click', ()=>{ modal.classList.remove('open'); });
-    modal.addEventListener('click', (ev)=>{ if (ev.target === modal) modal.classList.remove('open'); });
+    // keyboard navigation and cleanup
+    const keyHandler = (ev) => {
+        if (ev.key === 'Escape') {
+            modal.classList.remove('open');
+        } else if (ev.key === 'ArrowLeft') {
+            const id = `modal-${product.id}`;
+            const prevIndex = (slidesState[id] - 1 + images.length) % images.length;
+            showModalSlide(id, prevIndex);
+            pauseAutoAdvance(id);
+        } else if (ev.key === 'ArrowRight') {
+            const id = `modal-${product.id}`;
+            const nextIndex = (slidesState[id] + 1) % images.length;
+            showModalSlide(id, nextIndex);
+            pauseAutoAdvance(id);
+        }
+    };
+    document.addEventListener('keydown', keyHandler);
+
+    // close handlers with cleanup
+    const closeModal = ()=>{
+        modal.classList.remove('open');
+        document.removeEventListener('keydown', keyHandler);
+        stopAutoAdvance(`modal-${product.id}`);
+    };
+    document.getElementById('product-modal-close').addEventListener('click', closeModal);
+    modal.addEventListener('click', (ev)=>{ if (ev.target === modal) closeModal(); });
 }
 
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
